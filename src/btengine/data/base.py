@@ -39,24 +39,24 @@ class MarketDataProvider(ABC):
 
     @abstractmethod
     def get_funding_rate(
-        self, *, exchange: str, symbol: str, start: datetime, end: datetime
+        self, *, exchange: str, symbol: str, timeframe: Timeframe, start: datetime, end: datetime
     ) -> list[FundingRate]:
         """Return funding rate history for ``symbol`` on ``exchange`` in ``[start, end]``."""
 
     @abstractmethod
     def get_open_interest(
-        self, *, exchange: str, symbol: str, start: datetime, end: datetime
+        self, *, exchange: str, symbol: str, timeframe: Timeframe, start: datetime, end: datetime
     ) -> list[OpenInterest]:
         """Return open interest history for ``symbol`` on ``exchange`` in ``[start, end]``."""
 
     @abstractmethod
     def get_liquidations(
-        self, *, exchange: str, symbol: str, start: datetime, end: datetime
+        self, *, exchange: str, symbol: str, timeframe: Timeframe, start: datetime, end: datetime
     ) -> list[Liquidation]:
         """Return liquidation history for ``symbol`` on ``exchange`` in ``[start, end]``."""
 
     @abstractmethod
     def get_long_short_ratio(
-        self, *, exchange: str, symbol: str, start: datetime, end: datetime
+        self, *, exchange: str, symbol: str, timeframe: Timeframe, start: datetime, end: datetime
     ) -> list[LongShortRatio]:
         """Return long/short account ratio history for ``symbol`` on ``exchange``."""

@@ -13,13 +13,21 @@ single `Strategy.on_market_event(context)` interface.
 
 ## What's here
 
-**Data layer:**
-- An authenticated, rate-limited, retrying CoinGlass API client.
+**Data layer** (scoped to the CoinGlass **Startup** plan — see
+`docs/COINGLASS_INTEGRATION.md`):
+- An authenticated, rate-limited, retrying CoinGlass API client with
+  automatic pagination (CoinGlass caps every response at 1000 rows) and
+  connection verification (`verify_connection()`).
+- Plan-aware request validation (`plan_limits.py`): rejects unsupported
+  intervals or history lengths *before* any HTTP call.
 - Validation of every raw response before it is trusted.
 - Normalization of CoinGlass's response shape into a canonical,
-  provider-agnostic schema (`btengine.data.schema`).
+  provider-agnostic schema (`btengine.data.schema`), including instrument
+  discovery (`get_supported_markets()`).
 - A local Parquet+DuckDB cache to avoid re-fetching already-known data.
-- A historical data loader that fetches only missing sub-ranges and
+- `HistoricalDataService`: the reusable, cache-first historical data
+  loader meant to be shared by the Backtesting Engine, Demo Trading Agent,
+  and Live Trading Agent alike. Fetches only missing sub-ranges and
   surfaces missing candles/records as explicit gaps.
 
 **Core Backtesting Engine (`btengine.backtest`):**
@@ -58,16 +66,18 @@ from datetime import datetime, timedelta, timezone
 from btengine.data.providers.coinglass.provider import build_coinglass_provider
 from btengine.data.repository import DataRepository
 from btengine.data.schema import Timeframe
-from btengine.data.sync import DataSyncService
+from btengine.data.sync import HistoricalDataService
 
 provider = build_coinglass_provider()          # reads COINGLASS_API_KEY etc. from env
+provider.verify_connection()                    # raises immediately if the key/connection is bad
+
 repository = DataRepository("./data_cache")
-sync = DataSyncService(provider, repository)
+historical_data = HistoricalDataService(provider, repository)
 
 end = datetime.now(timezone.utc)
 start = end - timedelta(days=7)
 
-candles = sync.ensure_ohlcv(
+candles = historical_data.ensure_ohlcv(
     exchange="binance", symbol="BTCUSDT", timeframe=Timeframe.HOUR_1, start=start, end=end
 )
 ```

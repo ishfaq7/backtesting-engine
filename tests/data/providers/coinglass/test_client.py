@@ -191,3 +191,63 @@ def test_client_close_closes_underlying_http_client() -> None:
     with client:
         client.get("/api/x")
     assert client._http.is_closed
+
+
+def test_verify_connection_succeeds_against_supported_coins() -> None:
+    calls: list[str] = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        calls.append(request.url.path)
+        return httpx.Response(200, json={"code": "0", "msg": "ok", "data": ["BTC", "ETH"]})
+
+    client, _ = _make_client(handler)
+    client.verify_connection()  # must not raise
+    assert calls == ["/api/futures/supported-coins"]
+
+
+def test_verify_connection_raises_on_bad_credentials() -> None:
+    def handler(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(401, json={"code": "40100", "msg": "unauthorized"})
+
+    client, _ = _make_client(handler)
+    with pytest.raises(AuthenticationError):
+        client.verify_connection()
+
+
+def test_body_code_401_with_http_200_raises_authentication_error() -> None:
+    def handler(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(200, json={"code": "401", "msg": "invalid key", "data": None})
+
+    client, _ = _make_client(handler)
+    with pytest.raises(AuthenticationError):
+        client.get("/api/x")
+
+
+def test_body_code_429_with_http_200_raises_rate_limit_error() -> None:
+    def handler(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(200, json={"code": "429", "msg": "rate limited", "data": None})
+
+    client, _ = _make_client(handler)
+    with pytest.raises(RateLimitExceededError) as exc_info:
+        client.get("/api/x")
+    assert exc_info.value.retry_after_seconds is None
+
+
+@pytest.mark.parametrize("code", ["408", "500"])
+def test_body_code_transient_with_http_200_raises_transient_provider_error(code: str) -> None:
+    def handler(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(200, json={"code": code, "msg": "server hiccup", "data": None})
+
+    client, _ = _make_client(handler)
+    with pytest.raises(TransientProviderError):
+        client.get("/api/x")
+
+
+@pytest.mark.parametrize("code", ["400", "404", "405", "422"])
+def test_body_code_request_errors_with_http_200_raise_invalid_response_error(code: str) -> None:
+    def handler(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(200, json={"code": code, "msg": "bad request", "data": None})
+
+    client, _ = _make_client(handler)
+    with pytest.raises(InvalidResponseError):
+        client.get("/api/x")

@@ -139,7 +139,11 @@ class DataRepository:
         for row in frame.to_dict(orient="records"):
             kwargs = dict(row)
             kwargs["timestamp"] = _to_py_datetime(kwargs["timestamp"])
-            if timeframe is not None:
+            # `timeframe` only determines the cache file path (see
+            # _path_for); it is only also a *model field* for Candle, so it
+            # must not be re-injected into record types that don't have it
+            # (FundingRate, OpenInterest, Liquidation, LongShortRatio).
+            if timeframe is not None and "timeframe" in model_cls.model_fields:
                 kwargs["timeframe"] = timeframe
             records.append(model_cls(**kwargs))
         return records

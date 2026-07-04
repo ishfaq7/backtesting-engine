@@ -30,7 +30,7 @@ def test_defaults_are_sane() -> None:
     settings = load_coinglass_settings(api_key="secret-key", _env_file=None)
     assert settings.base_url == "https://open-api-v4.coinglass.com"
     assert settings.max_retries == 5
-    assert settings.rate_limit_requests == 30
+    assert settings.rate_limit_requests == 80
 
 
 def test_base_url_must_be_https() -> None:

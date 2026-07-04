@@ -5,8 +5,8 @@ This is deliberately a thin read-only adapter over
 :class:`~btengine.data.repository.DataRepository` — it never talks to a
 provider (CoinGlass or otherwise) and never fetches anything over the
 network. A backtest run assumes the required range has already been
-synced (via ``btengine.data.sync.DataSyncService``) before it starts; that
-separation keeps "acquiring data" and "replaying data" as independent
+synced (via ``btengine.data.sync.HistoricalDataService``) before it starts;
+that separation keeps "acquiring data" and "replaying data" as independent
 concerns.
 
 Multiple symbols are merged with a k-way heap merge keyed on timestamp, so

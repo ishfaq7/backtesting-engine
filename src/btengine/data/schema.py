@@ -28,7 +28,10 @@ class Timeframe(str, Enum):
     MIN_15 = "15m"
     MIN_30 = "30m"
     HOUR_1 = "1h"
+    HOUR_2 = "2h"
     HOUR_4 = "4h"
+    HOUR_6 = "6h"
+    HOUR_8 = "8h"
     HOUR_12 = "12h"
     DAY_1 = "1d"
     WEEK_1 = "1w"
@@ -91,10 +94,14 @@ class Candle(CanonicalRecord):
 
 
 class FundingRate(CanonicalRecord):
-    """A funding rate observation for a perpetual futures contract."""
+    """A funding rate observation for a perpetual futures contract.
+
+    CoinGlass's funding-rate history endpoints are themselves OHLC-shaped
+    (the funding rate open/high/low/close over one bar interval); adapters
+    map the bar's ``close`` to this single representative value.
+    """
 
     funding_rate: float
-    predicted_funding_rate: float | None = None
 
 
 class OpenInterest(CanonicalRecord):
@@ -131,3 +138,26 @@ class LongShortRatio(CanonicalRecord):
         if self.short_account_ratio == 0:
             return float("inf")
         return self.long_account_ratio / self.short_account_ratio
+
+
+class SupportedMarket(BaseModel):
+    """A tradable instrument a provider can supply historical data for.
+
+    Static reference/discovery data, not a time-series record — it has no
+    ``timestamp`` and does not extend :class:`CanonicalRecord`.
+    """
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    exchange: str
+    instrument_id: str
+    base_asset: str
+    quote_asset: str
+
+    @field_validator("exchange", "instrument_id", "base_asset", "quote_asset")
+    @classmethod
+    def _normalize_identifier(cls, value: str) -> str:
+        value = value.strip()
+        if not value:
+            raise ValueError("must not be empty")
+        return value.upper()

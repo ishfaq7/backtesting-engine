@@ -89,5 +89,19 @@ class UnsupportedInstrumentError(DataLayerError):
     """The requested symbol/exchange/timeframe is not supported by the provider."""
 
 
+class PlanRestrictionError(DataLayerError):
+    """The request falls outside what the account's subscription plan allows.
+
+    Raised *before* any HTTP call is made — e.g. requesting a 1-minute
+    interval or a history length the plan does not grant — so a plan
+    limitation surfaces as an immediate, actionable error instead of a
+    confusing API rejection or, worse, silently truncated data.
+    """
+
+    def __init__(self, message: str, *, plan: str, context: dict[str, Any] | None = None) -> None:
+        super().__init__(message, context={**(context or {}), "plan": plan})
+        self.plan = plan
+
+
 class CacheError(DataLayerError):
     """Reading from or writing to the local repository/cache failed."""

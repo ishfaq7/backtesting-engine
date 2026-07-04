@@ -22,6 +22,7 @@ from btengine.data.errors import (
     RateLimitExceededError,
     TransientProviderError,
 )
+from btengine.data.providers.coinglass import endpoints
 from btengine.data.providers.coinglass.auth import CoinGlassAuthProvider
 from btengine.data.providers.coinglass.config import CoinGlassSettings
 from btengine.data.providers.coinglass.rate_limiter import TokenBucketRateLimiter
@@ -70,6 +71,18 @@ class CoinGlassClient:
         never a raw ``httpx`` exception or an unhandled crash.
         """
         return self._retry_policy.run(lambda: self._do_request(endpoint, params))
+
+    def verify_connection(self) -> None:
+        """Confirm the configured credentials can reach CoinGlass.
+
+        Calls the lightweight ``supported-coins`` endpoint (available on
+        every plan tier). Returns normally on success; raises the same
+        structured errors as any other call (e.g.
+        :class:`~btengine.data.errors.AuthenticationError` for a bad key)
+        so callers get an immediate, specific reason for a failed
+        connection rather than a generic "it didn't work."
+        """
+        self.get(endpoints.SUPPORTED_COINS)
 
     def _do_request(self, endpoint: str, params: Mapping[str, Any] | None) -> Any:
         self._rate_limiter.acquire()
@@ -155,13 +168,14 @@ class CoinGlassClient:
                 payload_excerpt=str(body)[:500],
             )
 
-        if str(body.get("code")) != "0":
-            raise InvalidResponseError(
-                f"CoinGlass returned an error envelope for {endpoint}: "
-                f"code={body.get('code')} msg={body.get('msg')}",
-                endpoint=endpoint,
-                payload_excerpt=str(body)[:500],
+        code = str(body.get("code"))
+        if code != "0":
+            error = _error_for_body_code(code, endpoint=endpoint, body=body)
+            logger.warning(
+                "coinglass returned an error envelope",
+                extra={"endpoint": endpoint, "code": code, "body_msg": body.get("msg")},
             )
+            raise error
 
         logger.info("coinglass request succeeded", extra={"endpoint": endpoint})
         return body.get("data")
@@ -174,3 +188,36 @@ def _parse_retry_after(value: str | None) -> float | None:
         return float(value)
     except ValueError:
         return None
+
+
+def _error_for_body_code(code: str, *, endpoint: str, body: dict[str, Any]) -> Exception:
+    """Map CoinGlass's documented in-body error codes to a structured error.
+
+    CoinGlass sometimes signals an error via this ``code`` field with the
+    outer HTTP status still 200, so these are checked independently of the
+    HTTP-status branches above rather than assuming the two always agree.
+    """
+    msg = body.get("msg")
+    excerpt = str(body)[:500]
+    if code == "401":
+        return AuthenticationError(
+            f"CoinGlass rejected credentials for {endpoint}: {msg}", status_code=401, endpoint=endpoint
+        )
+    if code == "429":
+        return RateLimitExceededError(
+            f"CoinGlass rate limit exceeded for {endpoint}: {msg}",
+            retry_after_seconds=None,
+            endpoint=endpoint,
+        )
+    if code in ("408", "500"):
+        return TransientProviderError(
+            f"CoinGlass server-side error for {endpoint} (code={code}): {msg}", endpoint=endpoint
+        )
+    # 400 (bad params), 404 (not found), 405 (unsupported method), 422
+    # (semantically invalid params), and any unrecognized code are all
+    # non-retryable request problems.
+    return InvalidResponseError(
+        f"CoinGlass returned an error envelope for {endpoint}: code={code} msg={msg}",
+        endpoint=endpoint,
+        payload_excerpt=excerpt,
+    )

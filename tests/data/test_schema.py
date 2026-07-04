@@ -3,7 +3,7 @@ from datetime import datetime, timedelta, timezone
 import pytest
 from pydantic import ValidationError
 
-from btengine.data.schema import Candle, FundingRate, LongShortRatio, Timeframe
+from btengine.data.schema import Candle, FundingRate, LongShortRatio, SupportedMarket, Timeframe
 
 UTC_NOW = datetime(2024, 1, 1, tzinfo=timezone.utc)
 
@@ -93,7 +93,10 @@ def test_long_short_ratio_property_handles_zero_short_ratio() -> None:
         (Timeframe.MIN_15, timedelta(minutes=15)),
         (Timeframe.MIN_30, timedelta(minutes=30)),
         (Timeframe.HOUR_1, timedelta(hours=1)),
+        (Timeframe.HOUR_2, timedelta(hours=2)),
         (Timeframe.HOUR_4, timedelta(hours=4)),
+        (Timeframe.HOUR_6, timedelta(hours=6)),
+        (Timeframe.HOUR_8, timedelta(hours=8)),
         (Timeframe.HOUR_12, timedelta(hours=12)),
         (Timeframe.DAY_1, timedelta(days=1)),
         (Timeframe.WEEK_1, timedelta(weeks=1)),
@@ -110,3 +113,18 @@ def test_models_are_frozen() -> None:
     )
     with pytest.raises(ValidationError):
         candle.close = 999  # type: ignore[misc]
+
+
+def test_supported_market_normalizes_identifiers() -> None:
+    market = SupportedMarket(
+        exchange="binance", instrument_id="btcusdt_perp", base_asset="btc", quote_asset="usdt"
+    )
+    assert market.exchange == "BINANCE"
+    assert market.instrument_id == "BTCUSDT_PERP"
+    assert market.base_asset == "BTC"
+    assert market.quote_asset == "USDT"
+
+
+def test_supported_market_rejects_blank_fields() -> None:
+    with pytest.raises(ValidationError):
+        SupportedMarket(exchange="  ", instrument_id="BTCUSDT", base_asset="BTC", quote_asset="USDT")

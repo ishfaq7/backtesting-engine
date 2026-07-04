@@ -33,7 +33,9 @@ class CoinGlassSettings(BaseSettings):
     max_retries: int = Field(default=5, ge=0)
     backoff_base_seconds: float = Field(default=0.5, gt=0)
     backoff_max_seconds: float = Field(default=30.0, gt=0)
-    rate_limit_requests: int = Field(default=30, gt=0)
+    # Defaults match the account's actual Startup plan (80 requests/minute).
+    # Override via env if the plan changes.
+    rate_limit_requests: int = Field(default=80, gt=0)
     rate_limit_period_seconds: float = Field(default=60.0, gt=0)
 
     @field_validator("api_key")

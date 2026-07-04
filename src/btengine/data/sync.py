@@ -1,13 +1,17 @@
 """Historical data loader with cache-first fetch and gap detection.
 
-``DataSyncService`` is the single entry point application code should use
-to obtain historical data: given a record type and a date range, it reads
+``HistoricalDataService`` is the single, reusable entry point for obtaining
+historical market data — the same instance (or another built the same way)
+is meant to be used by the Backtesting Engine, and later the Demo and Live
+Trading Agents, so that all three read data from the same cache-first,
+gap-checked path instead of each re-implementing fetch/cache logic.
+
+Given a record type, symbol, exchange, timeframe, and date range, it reads
 whatever is already cached, detects which expected timestamps are missing,
 fetches *only* those missing sub-ranges from the provider, stores the
-result, and returns the fully merged range from the cache. This is what
-keeps CoinGlass API usage low (requirement: reduce API calls) while still
-catching partial/incomplete data (a provider outage, a bad prior sync)
-instead of silently backtesting over gaps.
+result, and returns the fully merged range from the cache. This keeps
+CoinGlass API usage low while still catching partial/incomplete data (a
+provider outage, a bad prior sync) instead of silently proceeding over gaps.
 """
 
 from __future__ import annotations
@@ -81,8 +85,14 @@ def find_gaps(
     return gaps
 
 
-class DataSyncService:
-    """Cache-first historical data loader built on a provider + repository."""
+class HistoricalDataService:
+    """Cache-first historical data loader built on a provider + repository.
+
+    Reusable as-is by the Backtesting Engine, Demo Trading Agent, and Live
+    Trading Agent: none of its behavior is specific to backtesting, only to
+    "get validated historical data for X in [start, end], from cache where
+    possible."
+    """
 
     def __init__(self, provider: MarketDataProvider, repository: DataRepository) -> None:
         self._provider = provider
@@ -181,89 +191,65 @@ class DataSyncService:
         )
 
     def ensure_funding_rate(
-        self,
-        *,
-        exchange: str,
-        symbol: str,
-        start: datetime,
-        end: datetime,
-        expected_interval: timedelta,
+        self, *, exchange: str, symbol: str, timeframe: Timeframe, start: datetime, end: datetime
     ) -> list[FundingRate]:
         return self._ensure_and_fill_gaps(
             FundingRate,
             lambda gap_start, gap_end: self._provider.get_funding_rate(
-                exchange=exchange, symbol=symbol, start=gap_start, end=gap_end
+                exchange=exchange, symbol=symbol, timeframe=timeframe, start=gap_start, end=gap_end
             ),
             exchange=exchange,
             symbol=symbol,
-            timeframe=None,
+            timeframe=timeframe,
             start=start,
             end=end,
-            expected_interval=expected_interval,
+            expected_interval=timeframe.duration,
         )
 
     def ensure_open_interest(
-        self,
-        *,
-        exchange: str,
-        symbol: str,
-        start: datetime,
-        end: datetime,
-        expected_interval: timedelta,
+        self, *, exchange: str, symbol: str, timeframe: Timeframe, start: datetime, end: datetime
     ) -> list[OpenInterest]:
         return self._ensure_and_fill_gaps(
             OpenInterest,
             lambda gap_start, gap_end: self._provider.get_open_interest(
-                exchange=exchange, symbol=symbol, start=gap_start, end=gap_end
+                exchange=exchange, symbol=symbol, timeframe=timeframe, start=gap_start, end=gap_end
             ),
             exchange=exchange,
             symbol=symbol,
-            timeframe=None,
+            timeframe=timeframe,
             start=start,
             end=end,
-            expected_interval=expected_interval,
+            expected_interval=timeframe.duration,
         )
 
     def ensure_liquidations(
-        self,
-        *,
-        exchange: str,
-        symbol: str,
-        start: datetime,
-        end: datetime,
-        expected_interval: timedelta,
+        self, *, exchange: str, symbol: str, timeframe: Timeframe, start: datetime, end: datetime
     ) -> list[Liquidation]:
         return self._ensure_and_fill_gaps(
             Liquidation,
             lambda gap_start, gap_end: self._provider.get_liquidations(
-                exchange=exchange, symbol=symbol, start=gap_start, end=gap_end
+                exchange=exchange, symbol=symbol, timeframe=timeframe, start=gap_start, end=gap_end
             ),
             exchange=exchange,
             symbol=symbol,
-            timeframe=None,
+            timeframe=timeframe,
             start=start,
             end=end,
-            expected_interval=expected_interval,
+            expected_interval=timeframe.duration,
         )
 
     def ensure_long_short_ratio(
-        self,
-        *,
-        exchange: str,
-        symbol: str,
-        start: datetime,
-        end: datetime,
-        expected_interval: timedelta,
+        self, *, exchange: str, symbol: str, timeframe: Timeframe, start: datetime, end: datetime
     ) -> list[LongShortRatio]:
         return self._ensure_and_fill_gaps(
             LongShortRatio,
             lambda gap_start, gap_end: self._provider.get_long_short_ratio(
-                exchange=exchange, symbol=symbol, start=gap_start, end=gap_end
+                exchange=exchange, symbol=symbol, timeframe=timeframe, start=gap_start, end=gap_end
             ),
             exchange=exchange,
             symbol=symbol,
-            timeframe=None,
+            timeframe=timeframe,
             start=start,
             end=end,
-            expected_interval=expected_interval,
+            expected_interval=timeframe.duration,
         )
