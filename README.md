@@ -45,6 +45,15 @@ single `Strategy.on_market_event(context)` interface.
 Structured, typed errors everywhere in both layers — no bare `Exception`,
 no silent failures.
 
+**Research platform extensions** (architecture/scaffolding only — see
+`docs/RESEARCH_PLATFORM_ARCHITECTURE.md`): a Feature Engineering Layer and
+Feature Store (`btengine.features`, `btengine.feature_store`), quant
+research tooling (`btengine.research`: walk-forward splitting, Monte Carlo
+validation, batch/portfolio/multi-coin backtesting), strategy versioning
+and profile presets (new files in `btengine.strategy`), and forward-looking
+Protocol seams for AI models, live trading, and a web dashboard
+(`btengine.integrations`). None of this touched an existing file.
+
 ## Setup
 
 ```bash
