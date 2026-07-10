@@ -1,0 +1,13 @@
+# Open Interest Rules
+# Feeds from CoinGlass open-interest data (see docs/COINGLASS_INTEGRATION.md
+# §3, "Open Interest Analysis"). See btengine/strategy/rules/open_interest.py
+# for the schema and docs/strategy_spec.md §Open Interest Rules for notes.
+#
+# TODO(owner): this category has no conditions yet. Add entries under
+# `conditions` and set `enabled: true` once ready (see funding_rate.yaml
+# for a worked example of the shape).
+
+enabled: false
+combination_logic: ALL
+conditions: []
+notes: ""

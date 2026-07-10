@@ -1,0 +1,22 @@
+# Funding Rate Rules
+# Feeds from CoinGlass funding-rate data (see docs/COINGLASS_INTEGRATION.md
+# §3, "Funding Rate Analysis"). See btengine/strategy/rules/funding_rate.py
+# for the schema and docs/strategy_spec.md §Funding Rules for notes.
+#
+# TODO(owner): this category has no conditions yet. Add entries under
+# `conditions` and set `enabled: true` once ready. Example shape:
+#
+# enabled: true
+# combination_logic: ALL   # ALL | ANY | CUSTOM
+# conditions:
+#   - name: funding_rate_extreme_positive
+#     feature: funding_rate            # TODO(owner): which computed feature this reads
+#     operator: GT                     # GT | GTE | LT | LTE | EQ | NEQ | BETWEEN
+#     value: null                      # TODO(owner): required threshold
+#     enabled: true
+#     description: ""
+
+enabled: false
+combination_logic: ALL
+conditions: []
+notes: ""

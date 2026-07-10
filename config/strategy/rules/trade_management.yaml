@@ -1,0 +1,25 @@
+# Trade Management Rules
+# Adjustments to an already-open position (trailing stops, partial exits,
+# breakeven moves) - distinct from exit.yaml, which closes a position
+# outright. Each rule pairs a generic trigger condition with a named,
+# owner-defined action. See btengine/strategy/rules/trade_management.py
+# for the schema and docs/strategy_spec.md §Trade Management for notes.
+#
+# TODO(owner): this category has no actions yet. Add entries under
+# `actions` and set `enabled: true` once ready. Example shape:
+#
+# enabled: true
+# actions:
+#   - name: move_to_breakeven
+#     trigger:
+#       name: breakeven_trigger
+#       feature: unrealized_pnl_pct   # TODO(owner): which computed feature this reads
+#       operator: GTE                 # GT | GTE | LT | LTE | EQ | NEQ | BETWEEN
+#       value: null                   # TODO(owner): required threshold
+#     action: null                    # TODO(owner): e.g. "MOVE_STOP_TO_BREAKEVEN" | "PARTIAL_EXIT" (open)
+#     action_params: {}               # TODO(owner): any parameters the action needs
+#     enabled: true
+
+enabled: false
+actions: []
+notes: ""

@@ -54,6 +54,19 @@ and profile presets (new files in `btengine.strategy`), and forward-looking
 Protocol seams for AI models, live trading, and a web dashboard
 (`btengine.integrations`). None of this touched an existing file.
 
+**Proprietary Strategy Specification Framework** (config schema only, no
+trading logic — see `docs/STRATEGY_SPEC_FRAMEWORK.md` and
+`docs/strategy_spec.md`): a generic `RuleCondition`/`RuleSet` primitive
+reused across all 16 rule categories (Funding Rate, Open Interest,
+Premium/Discount, Liquidity, Market Structure, CVD, ATR, Entry, Exit, Risk
+Management, No Trade, Trade Management, Position Management, Session
+Filters, Market Condition Filters, Scoring), a YAML loader
+(`btengine.strategy.spec_loader`), and a structural validator
+(`btengine.strategy.spec_validation`) that checks for missing rules,
+invalid configs, conflicting conditions, and duplicates — never for
+whether a threshold is "good." Every threshold/weight/parameter in
+`config/strategy/` ships unset; nothing was invented.
+
 ## Setup
 
 ```bash

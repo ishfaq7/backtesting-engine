@@ -1,0 +1,15 @@
+# Entry Rules
+# Conditions that must hold for the strategy to open a new position,
+# typically evaluated together with the Scoring Model (see scoring.yaml)
+# and only once no No Trade Condition is blocking (see no_trade.yaml).
+# See btengine/strategy/rules/entry.py for the schema and
+# docs/strategy_spec.md §Entry Rules for notes.
+#
+# TODO(owner): this category has no conditions yet. Add entries under
+# `conditions` and set `enabled: true` once ready (see
+# rules/funding_rate.yaml for a worked example of the shape).
+
+enabled: false
+combination_logic: ALL
+conditions: []
+notes: ""

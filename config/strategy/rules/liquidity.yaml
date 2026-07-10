@@ -1,0 +1,14 @@
+# Liquidity Rules
+# Feeds from CoinGlass liquidation and long/short positioning data (see
+# docs/COINGLASS_INTEGRATION.md §3, "Liquidity Analysis"). See
+# btengine/strategy/rules/liquidity.py for the schema and
+# docs/strategy_spec.md §Liquidity Rules for notes.
+#
+# TODO(owner): this category has no conditions yet. Add entries under
+# `conditions` and set `enabled: true` once ready (see funding_rate.yaml
+# for a worked example of the shape).
+
+enabled: false
+combination_logic: ALL
+conditions: []
+notes: ""

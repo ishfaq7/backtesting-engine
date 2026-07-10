@@ -1,0 +1,17 @@
+# Risk Management Rules
+# Strategy-level position sizing and exposure limits - proprietary
+# parameters, distinct from the Core Backtesting Engine's own generic,
+# strategy-agnostic order validation. See
+# btengine/strategy/rules/risk_management.py for the schema and
+# docs/strategy_spec.md §Risk Rules for notes.
+#
+# TODO(owner): every value below is a placeholder. All fields are
+# required once enabled: true.
+
+enabled: false
+max_risk_per_trade_pct: null    # TODO(owner): required, e.g. 1.0 (percent of capital)
+max_leverage: null              # TODO(owner): required
+max_concurrent_positions: null  # TODO(owner): required
+max_daily_loss_pct: null        # TODO(owner): required
+stop_loss_type: null            # TODO(owner): required, e.g. "FIXED_PCT" | "ATR_MULTIPLE" (open - no enum assumed)
+notes: ""

@@ -1,0 +1,17 @@
+# Market Condition Filters
+# Conditions gating trading based on overall market regime (e.g.
+# volatility or trend regime) - distinct from Session Filters (time-based)
+# and No Trade Conditions (event/state veto). Will likely draw on the
+# Market Structure/ATR analyzers once implemented (see
+# rules/market_structure.yaml, rules/atr.yaml). See
+# btengine/strategy/rules/market_condition_filters.py for the schema and
+# docs/strategy_spec.md §Market Filters for notes.
+#
+# TODO(owner): this category has no conditions yet. Add entries under
+# `conditions` and set `enabled: true` once ready (see
+# rules/funding_rate.yaml for a worked example of the shape).
+
+enabled: false
+combination_logic: ALL
+conditions: []
+notes: ""

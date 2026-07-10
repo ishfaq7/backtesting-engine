@@ -1,0 +1,16 @@
+# Session Filters
+# Conditions gating *when* trading is allowed (time-of-day, day-of-week,
+# specific date exclusions). Uses the same generic condition shape as
+# every other category - e.g. a condition with feature: hour_of_day_utc -
+# no assumption is made here about which sessions matter. See
+# btengine/strategy/rules/session_filters.py for the schema and
+# docs/strategy_spec.md §Market Filters for notes.
+#
+# TODO(owner): this category has no conditions yet. Add entries under
+# `conditions` and set `enabled: true` once ready (see
+# rules/funding_rate.yaml for a worked example of the shape).
+
+enabled: false
+combination_logic: ALL
+conditions: []
+notes: ""

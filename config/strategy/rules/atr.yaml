@@ -1,0 +1,13 @@
+# ATR Rules (future support)
+# Would feed from btengine.features.atr.ATRAnalyzer, which is an
+# interface-only stub today (no calculation exists yet - see
+# docs/RESEARCH_PLATFORM_ARCHITECTURE.md). Leave disabled until that
+# analyzer is implemented.
+#
+# TODO(owner): no conditions can be meaningfully defined until the
+# underlying analyzer exists.
+
+enabled: false
+combination_logic: ALL
+conditions: []
+notes: "Future support - ATRAnalyzer is not yet implemented."

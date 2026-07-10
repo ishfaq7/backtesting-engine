@@ -1,0 +1,14 @@
+# CVD Rules (future support)
+# Would feed from btengine.features.cvd.CVDAnalyzer, which is an
+# interface-only stub today and additionally needs taker buy/sell volume
+# data not yet wired into the data layer (see
+# docs/COINGLASS_INTEGRATION.md, "Additional data likely needed later").
+# Leave disabled until both are implemented.
+#
+# TODO(owner): no conditions can be meaningfully defined until the
+# underlying analyzer and its data source exist.
+
+enabled: false
+combination_logic: ALL
+conditions: []
+notes: "Future support - CVDAnalyzer and its taker buy/sell volume data source are not yet implemented."

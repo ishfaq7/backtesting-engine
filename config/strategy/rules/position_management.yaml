@@ -1,0 +1,14 @@
+# Position Management Rules
+# How position size evolves over its lifetime (pyramiding, scale-ins,
+# netting behavior). See btengine/strategy/rules/position_management.py
+# for the schema and docs/strategy_spec.md §Position Management for notes.
+#
+# TODO(owner): every value below is a placeholder. allow_pyramiding and
+# netting_mode are required once enabled: true; max_position_scale_ins is
+# additionally required if allow_pyramiding is true.
+
+enabled: false
+allow_pyramiding: null       # TODO(owner): required, true | false
+max_position_scale_ins: null # TODO(owner): required if allow_pyramiding is true
+netting_mode: null           # TODO(owner): required, e.g. "NET" | "HEDGE" (open - no default assumed)
+notes: ""

@@ -1,0 +1,18 @@
+# No Trade Conditions
+# A veto layer: if the conditions here hold (per combination_logic), the
+# strategy must not enter, regardless of score or Entry Rules. See
+# btengine/strategy/rules/no_trade.py for the schema and
+# docs/strategy_spec.md §No Trade Rules for notes.
+#
+# TODO(owner): this category has no conditions yet. Add entries under
+# `conditions` and set `enabled: true` once ready (see
+# rules/funding_rate.yaml for a worked example of the shape). Also decide
+# combination_logic deliberately: ANY means a single blocking condition is
+# enough to veto a trade; ALL means every listed condition must hold
+# simultaneously to veto. Left at the schema default (ALL) here - change
+# it if that's not what you intend.
+
+enabled: false
+combination_logic: ALL
+conditions: []
+notes: ""

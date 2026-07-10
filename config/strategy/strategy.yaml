@@ -1,0 +1,19 @@
+# Top-level Strategy Specification metadata.
+# See docs/strategy_spec.md for the full human-readable template and
+# docs/STRATEGY_SPEC_FRAMEWORK.md for how this file is loaded/validated.
+#
+# TODO(owner): every value below is a placeholder. Fill in and then run
+# the StrategySpecValidator - it will tell you exactly what's still missing.
+
+name: ""        # TODO(owner): required, e.g. "funding-momentum"
+version: ""     # TODO(owner): required, e.g. "0.1.0" - see strategy/versioning.py
+
+# Optional: reference one of the StrategyProfile presets (CONSERVATIVE /
+# BALANCED / AGGRESSIVE) defined in btengine.strategy.profiles. Leave unset
+# if this strategy does not use a profile preset.
+profile: null   # TODO(owner): optional - "CONSERVATIVE" | "BALANCED" | "AGGRESSIVE"
+
+# Free-text notes the validator does not check - use these to record
+# anything a future reader (including yourself) needs to know.
+known_assumptions: []   # TODO(owner): e.g. "Funding rate sourced from Binance only"
+todo: []                 # TODO(owner): e.g. "Confirm liquidation field names against a live API key"

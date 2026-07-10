@@ -1,0 +1,26 @@
+# Scoring Model configuration - shape only, no scoring logic.
+# See btengine/strategy/scoring/config.py for the schema and
+# docs/strategy_spec.md §Scoring for the human-readable template.
+#
+# TODO(owner): every value below is a placeholder.
+
+version: ""        # TODO(owner): required, e.g. "0.1.0"
+enabled: false      # TODO(owner): set true once factors/thresholds are defined below
+
+factors: []
+# TODO(owner): add one entry per scoring factor, e.g.:
+#   - name: funding_rate_factor
+#     source_rule_set: funding_rate   # must match a known rule category (see KNOWN_RULE_CATEGORIES)
+#     weight: null                    # TODO(owner): required
+#     enabled: true
+
+entry_threshold: null   # TODO(owner): required once scoring is enabled
+exit_threshold: null    # TODO(owner): required once scoring is enabled
+
+# Future AI scoring support (see docs/RESEARCH_PLATFORM_ARCHITECTURE.md,
+# btengine.integrations.ai_model.AIModelProvider). Leave disabled until a
+# concrete model integration exists.
+ai_scoring_enabled: false
+ai_model_name: null      # TODO(owner): required if ai_scoring_enabled is true
+
+notes: ""
