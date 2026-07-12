@@ -1,0 +1,43 @@
+# Signal Validation Engine configuration - shape only, no strategy logic.
+# See btengine/signal_validation/config.py for the schema and
+# docs/SIGNAL_VALIDATION_ENGINE.md for the architecture this drives.
+#
+# TODO(owner): every threshold-shaped value below is a placeholder.
+# "How stale is too stale," "how much timestamp drift is acceptable,"
+# "what confidence counts as low," and "what completeness ratio is
+# sufficient" are all strategy-owner judgment calls this framework
+# cannot make on your behalf.
+
+engine_version: null   # TODO(owner): required, e.g. "0.1.0"
+
+# TODO(owner): set to enable the "version mismatch" check against
+# StrategyScore.score_version. null = not checked.
+expected_score_version: null
+
+# TODO(owner): set (in seconds) to enable "data freshness" staleness
+# detection. null = staleness is never flagged (a future timestamp is
+# still flagged unconditionally, regardless of this setting).
+max_staleness_seconds: null
+
+# TODO(owner): set (in seconds) to enable the "conflicting module
+# outputs" timestamp-divergence check. null = timestamp skew between
+# the four analyses is never flagged.
+max_timestamp_skew_seconds: null
+
+# TODO(owner): set to enable ConfidenceStatus.LOW classification and the
+# corresponding "invalid confidence values" warning. null = not checked.
+min_confidence: null
+
+# TODO(owner): set to enable FeatureCompleteness.is_sufficient and the
+# "strategy completeness" ratio warning. null = not checked.
+min_completeness_ratio: null
+
+# Provider names that MUST be AVAILABLE or a missing one becomes an
+# ERROR (validation_passed = false) instead of a WARNING. Empty = no
+# provider is required.
+required_providers: []
+
+# Bounded per-symbol history size used by the "historical consistency"
+# (monotonic as_of) check - a generic technical buffer size, not a
+# threshold.
+history_window: 20
