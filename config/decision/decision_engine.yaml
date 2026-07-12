@@ -1,0 +1,36 @@
+# Decision Engine configuration - shape only, no decision logic.
+# See btengine/decision/config.py for the schema and
+# docs/DECISION_ENGINE_FRAMEWORK.md for the architecture this drives.
+#
+# TODO(owner): every strategy-shaped value below is a placeholder.
+# This engine never decides BUY/SELL/ENTER/EXIT - it only prepares a
+# readiness diagnosis. Actual decision providers (Rule-based, AI,
+# Ensemble) are proprietary content this configuration does not define.
+
+engine_version: null   # TODO(owner): required, e.g. "0.1.0"
+
+# TODO(owner): set to enable the "strategy version mismatch" check
+# against ValidatedStrategyState.strategy_version. null = not checked.
+expected_strategy_version: null
+
+# Provider names that MUST be registered with the engine (via its
+# `providers=[...]` constructor argument) or a validation ERROR is
+# raised ("unsupported decision providers"). Empty = none required -
+# the engine runs happily with zero providers, permanently PENDING,
+# until proprietary decision logic exists.
+required_providers: []
+
+# Deterministic provider evaluation order, e.g. {rule_based: 0, ai: 1}.
+# A provider absent here sorts after every explicitly-prioritized one.
+# Empty = no explicit ordering.
+provider_priorities: {}
+
+# An operational safety default, not a trading rule: whether an
+# upstream ValidatedStrategyState.validation_passed == false forces
+# DecisionStatus.NOT_READY regardless of what decision providers might
+# otherwise produce.
+require_validation_passed: true
+
+# Bounded per-symbol history size used by the "duplicate processing"
+# check - a generic technical buffer size, not a threshold.
+history_window: 20
