@@ -41,12 +41,20 @@ class HistoricalCandleSource(Protocol):
 
 @dataclass(frozen=True)
 class FeatureValue:
-    """One computed feature value for one symbol at one point in time."""
+    """One computed feature value for one symbol at one point in time.
+
+    ``version`` identifies which revision of a feature's calculation
+    produced this value (e.g. if a rolling-window formula changes, bump
+    the version rather than silently mixing old and new values under the
+    same feature name in the Feature Store). Defaults to ``"v1"`` so
+    existing callers that don't care about versioning are unaffected.
+    """
 
     symbol: str
     feature_name: str
     timestamp: datetime
     value: float
+    version: str = "v1"
 
 
 class FeatureAnalyzer(ABC):

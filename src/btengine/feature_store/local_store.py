@@ -3,8 +3,13 @@
 Mirrors the proven pattern in ``btengine.data.repository.DataRepository``
 (one file per partition, idempotent merge-on-write, DuckDB range reads) —
 deliberately re-implemented here rather than reused, since the Feature
-Store is a distinct component from the Data Layer's repository and this
-architecture pass must not modify existing modules.
+Store is a distinct component from the Data Layer's repository.
+
+Each stored row carries its :attr:`~btengine.features.base.FeatureValue.version`
+as a plain column, so re-computing a feature under a new version doesn't
+silently overwrite or blend with the old one — both coexist in the same
+file, distinguishable by ``version``, until a caller asks for one
+specifically via :meth:`read`'s ``version`` argument.
 """
 
 from __future__ import annotations
@@ -48,23 +53,34 @@ class LocalFeatureStore(FeatureStore):
             new_df = pd.DataFrame({
                 "timestamp": [value.timestamp for value in values],
                 "value": [value.value for value in values],
+                "version": [value.version for value in values],
             })
             new_df["timestamp"] = pd.to_datetime(new_df["timestamp"], utc=True)
 
             if path.exists():
                 existing_df = pd.read_parquet(path)
+                if "version" not in existing_df.columns:
+                    existing_df["version"] = "v1"  # legacy file written before versioning existed
                 combined = pd.concat([existing_df, new_df], ignore_index=True)
             else:
                 combined = new_df
 
-            combined = combined.drop_duplicates(subset=["timestamp"], keep="last")
-            combined = combined.sort_values("timestamp").reset_index(drop=True)
+            # Different versions of the same timestamp intentionally coexist;
+            # only an exact (timestamp, version) repeat is a true duplicate.
+            combined = combined.drop_duplicates(subset=["timestamp", "version"], keep="last")
+            combined = combined.sort_values(["timestamp", "version"]).reset_index(drop=True)
             combined.to_parquet(path, index=False)
         except Exception as exc:  # noqa: BLE001 - boundary layer: never let a raw I/O crash escape
             raise FeatureStoreError(f"Failed writing feature store file {path}") from exc
 
     def read(
-        self, *, symbol: str, feature_name: str, start: datetime, end: datetime
+        self,
+        *,
+        symbol: str,
+        feature_name: str,
+        start: datetime,
+        end: datetime,
+        version: str | None = None,
     ) -> list[FeatureValue]:
         path = self._path_for(symbol, feature_name)
         if not path.exists():
@@ -84,13 +100,20 @@ class LocalFeatureStore(FeatureStore):
 
         results: list[FeatureValue] = []
         for row in frame.to_dict(orient="records"):
+            row_version = row.get("version") or "v1"
+            if version is not None and row_version != version:
+                continue
             timestamp = row["timestamp"]
             to_pydatetime = getattr(timestamp, "to_pydatetime", None)
             if callable(to_pydatetime):
                 timestamp = to_pydatetime()
             results.append(
                 FeatureValue(
-                    symbol=symbol.upper(), feature_name=feature_name, timestamp=timestamp, value=row["value"]
+                    symbol=symbol.upper(),
+                    feature_name=feature_name,
+                    timestamp=timestamp,
+                    value=row["value"],
+                    version=row_version,
                 )
             )
         return results

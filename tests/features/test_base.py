@@ -42,3 +42,18 @@ def test_feature_value_is_frozen() -> None:
     )
     with pytest.raises(Exception):
         value.value = 2.0  # type: ignore[misc]
+
+
+def test_feature_value_defaults_to_version_v1() -> None:
+    value = FeatureValue(
+        symbol="BTCUSDT", feature_name="x", timestamp=datetime(2024, 1, 1, tzinfo=timezone.utc), value=1.0
+    )
+    assert value.version == "v1"
+
+
+def test_feature_value_accepts_explicit_version() -> None:
+    value = FeatureValue(
+        symbol="BTCUSDT", feature_name="x", timestamp=datetime(2024, 1, 1, tzinfo=timezone.utc), value=1.0,
+        version="v2",
+    )
+    assert value.version == "v2"

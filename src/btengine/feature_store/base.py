@@ -27,6 +27,10 @@ class FeatureStore(ABC):
 
     @abstractmethod
     def read(
-        self, *, symbol: str, feature_name: str, start: datetime, end: datetime
+        self, *, symbol: str, feature_name: str, start: datetime, end: datetime, version: str | None = None
     ) -> list[FeatureValue]:
-        """Return stored values for ``symbol``/``feature_name`` in ``[start, end]``."""
+        """Return stored values for ``symbol``/``feature_name`` in ``[start, end]``.
+
+        If ``version`` is given, only values written under that exact
+        version are returned; otherwise every stored version is returned.
+        """
