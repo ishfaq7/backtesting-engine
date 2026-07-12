@@ -1,0 +1,45 @@
+# Scoring Engine configuration - shape only, no scoring logic.
+# See btengine/scoring/config.py for the schema and
+# docs/SCORING_ENGINE_FRAMEWORK.md for the architecture this drives.
+#
+# TODO(owner): every weight/threshold-shaped value below is a placeholder.
+# This is the ENGINE's own runtime config (loaded via
+# btengine.scoring.config.load_scoring_engine_config). It is distinct
+# from - but can be derived from - the declarative strategy-spec layer's
+# config/strategy/scoring.yaml (see weights_from_scoring_model_config()
+# for the adapter between the two).
+
+engine_version: null   # TODO(owner): required, e.g. "0.1.0"
+
+# One weight per Score Provider. A total_score is only ever computed when
+# every AVAILABLE component's weight is set here - an unset weight is
+# not silently treated as zero or as an equal share.
+weights:
+  funding: null           # TODO(owner): required to include funding in total_score
+  open_interest: null     # TODO(owner): required to include open_interest in total_score
+  premium_discount: null  # TODO(owner): required to include premium_discount in total_score
+  liquidity: null         # TODO(owner): required to include liquidity in total_score
+
+# Optional deterministic evaluation-order priority per provider. Purely
+# an ordering utility (see order_providers_by_priority()) - does not by
+# itself let one provider override another's value.
+priorities:
+  funding: null
+  open_interest: null
+  premium_discount: null
+  liquidity: null
+
+# Provider names that MUST be present (analysis given + provider
+# implemented) or the resulting StrategyScore.validation_status becomes
+# INVALID and total_score is withheld. Empty = nothing is required.
+required_providers: []
+
+# The framework's own normalized score scale (a structural bound, not a
+# strategy threshold) - every ScoreComponent.value must fall within
+# [score_min, score_max] or it's flagged INVALID.
+score_min: 0.0
+score_max: 1.0
+
+# How the four analyzers' own confidence_level values combine into
+# StrategyScore.confidence. MIN (conservative, "weakest link") or MEAN.
+confidence_aggregation: MIN
