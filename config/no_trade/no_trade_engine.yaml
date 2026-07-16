@@ -1,0 +1,34 @@
+# No Trade Framework configuration - shape only, no gating rules.
+# See btengine/no_trade/config.py for the schema and
+# docs/NO_TRADE_FRAMEWORK.md for the architecture this drives.
+#
+# TODO(owner): every rule-shaped value below is a placeholder. What
+# market condition, time window, session, or exchange state should
+# block trading are proprietary no-trade rules this framework does not
+# invent. Under the engine's fail-safe gating semantics, an
+# unimplemented or unconfigured filter keeps trading blocked - the gate
+# never opens by default.
+
+engine_version: null   # TODO(owner): required, e.g. "0.1.0"
+
+# TODO(owner): set to enable the "strategy version mismatch" check
+# against DecisionContext.strategy_version. null = not checked.
+expected_strategy_version: null
+
+# null = every registered filter runs. A list restricts evaluation to
+# just the named filters (skipped filters are recorded in assessment
+# metadata). Known built-in names: market_condition_filter, risk_filter,
+# strategy_filter, portfolio_filter, data_quality_filter, time_filter,
+# session_filter, exchange_filter.
+enabled_filters: null
+
+# TODO(owner): free-form parameters for future filter implementations,
+# keyed by filter name. This framework defines no keys - each future
+# filter documents and reads its own. Example shape:
+#   time_filter:
+#     blocked_windows: []        # TODO(owner)
+#   session_filter:
+#     blocked_sessions: []       # TODO(owner)
+#   exchange_filter:
+#     allowed_exchanges: []      # TODO(owner)
+filter_parameters: {}
