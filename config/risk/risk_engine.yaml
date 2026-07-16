@@ -1,0 +1,35 @@
+# Risk Management Framework configuration - shape only, no risk rules.
+# See btengine/risk/config.py for the schema and
+# docs/RISK_MANAGEMENT_FRAMEWORK.md for the architecture this drives.
+#
+# TODO(owner): every limit below is a placeholder. Maximum leverage,
+# per-trade risk, drawdown limits, exposure caps, capital allocation,
+# margin utilization, and portfolio risk budgets are all proprietary
+# risk rules this framework does not invent. An unset (null) limit means
+# the corresponding risk module has nothing to evaluate against and
+# reports "could not evaluate" - which, under the engine's fail-safe
+# semantics, can never become an approval.
+
+engine_version: null   # TODO(owner): required, e.g. "0.1.0"
+
+# TODO(owner): set to enable the "strategy version mismatch" check
+# against DecisionContext.strategy_version. null = not checked.
+expected_strategy_version: null
+
+# Named risk profiles. Define as many as needed (e.g. conservative /
+# aggressive) and select one via active_profile. All *_pct values are
+# fractions of equity (0.02 = 2%) - a unit convention only; the values
+# themselves are TODO(owner).
+active_profile: null   # TODO(owner): e.g. "default"
+
+profiles: {}
+# TODO(owner): fill in, e.g.:
+#   default:
+#     max_leverage: null                  # TODO(owner): required for leverage validation
+#     max_risk_per_trade_pct: null        # TODO(owner): required for max-risk validation
+#     max_daily_drawdown_pct: null        # TODO(owner): required for daily drawdown protection
+#     max_total_drawdown_pct: null        # TODO(owner): required for total drawdown protection
+#     max_exposure_pct: null              # TODO(owner): required for exposure management
+#     max_capital_allocation_pct: null    # TODO(owner): required for capital allocation
+#     max_margin_utilization_pct: null    # TODO(owner): required for margin validation
+#     max_portfolio_risk_pct: null        # TODO(owner): required for portfolio risk
